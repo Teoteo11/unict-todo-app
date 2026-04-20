@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
-import { getTodos, createTodo, updateTodo } from './services/todoService';
+import { getTodos, createTodo, updateTodo, deleteTodo } from './services/todoService';
 import type { Todo } from './models/todo';
 
 function App() {
@@ -39,8 +39,10 @@ function App() {
     setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
   };
 
-  const removeTodo = (id: number) => {
-    setTodos(todos.filter((t) => t.id !== id));
+  const removeTodo = async (id: number) => {
+    await deleteTodo(id);
+    // Update the UI only after the service confirms deletion
+    setTodos((prev) => prev.filter((t) => t.id !== id));
   };
 
   const activeCount = todos.filter((t) => !t.completed).length;

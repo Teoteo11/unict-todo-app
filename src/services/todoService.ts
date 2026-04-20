@@ -42,3 +42,9 @@ export async function updateTodo(
   mockDb = mockDb.map((t) => (t.id === id ? updated : t));
   return updated;
 }
+
+// DELETE /todos/:id — removes a todo from the db, returns void (like HTTP 204)
+export async function deleteTodo(id: number): Promise<void> {
+  await delay(250);
+  mockDb = mockDb.filter((t) => t.id !== id);
+}
