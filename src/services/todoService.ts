@@ -28,3 +28,17 @@ export async function createTodo(text: string): Promise<Todo> {
   mockDb = [...mockDb, newTodo];
   return newTodo;
 }
+
+// PUT /todos/:id — partially updates an existing todo
+export async function updateTodo(
+  id: number,
+  patch: Partial<Pick<Todo, 'text' | 'completed'>>
+): Promise<Todo> {
+  await delay(300);
+  const found = mockDb.find((t) => t.id === id);
+  if (!found) throw new Error(`Todo with id ${id} not found`);
+
+  const updated = { ...found, ...patch };
+  mockDb = mockDb.map((t) => (t.id === id ? updated : t));
+  return updated;
+}

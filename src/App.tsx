@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
-import { getTodos, createTodo } from './services/todoService';
+import { getTodos, createTodo, updateTodo } from './services/todoService';
 import type { Todo } from './models/todo';
 
 function App() {
@@ -30,10 +30,13 @@ function App() {
     setTodos([...todos, newTodo]);
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map((t) =>
-      t.id === id ? { ...t, completed: !t.completed } : t
-    ));
+  const toggleTodo = async (id: number) => {
+    // Pattern: read current state -> compute next value -> call service
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+
+    const updated = await updateTodo(id, { completed: !todo.completed });
+    setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
   };
 
   const removeTodo = (id: number) => {
