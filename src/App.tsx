@@ -16,10 +16,12 @@ function App() {
     setTodos([...todos, newTodo]);
   };
 
+  const activeCount = todos.filter((t) => !t.completed).length;
+
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <Header />
+        <Header activeCount={activeCount} />
         <TodoForm onAdd={addTodo} />
         <TodoList todos={todos} />
       </div>

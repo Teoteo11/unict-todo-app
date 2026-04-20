@@ -7,10 +7,12 @@ interface TodoListProps {
 }
 
 function TodoList({ todos }: TodoListProps) {
+  // Early return: early exit to handle the special case
   if (todos.length === 0) {
     return <EmptyState />;
   }
 
+  // If we get here, the list has at least one element
   return (
     <div className="flex flex-col gap-2">
       {todos.map((todo) => (
