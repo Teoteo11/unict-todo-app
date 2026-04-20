@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
+import FilterBar, { type FilterType } from './components/FilterBar';
 import { getTodos, createTodo, updateTodo, deleteTodo } from './services/todoService';
 import type { Todo } from './models/todo';
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState<FilterType>('all');
 
   // GET: load todos from the service at mount
   useEffect(() => {
@@ -45,7 +47,15 @@ function App() {
     setTodos((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // Derived state: computed from todos, not stored in a separate state variable
   const activeCount = todos.filter((t) => !t.completed).length;
+  const completedCount = todos.filter((t) => t.completed).length;
+
+  const filteredTodos = todos.filter((t) => {
+    if (filter === 'active') return !t.completed;
+    if (filter === 'completed') return t.completed;
+    return true;
+  });
 
   // Early return: show a loading state while the data is loading
   if (loading) {
@@ -61,7 +71,18 @@ function App() {
       <div className="w-full max-w-lg">
         <Header activeCount={activeCount} />
         <TodoForm onAdd={addTodo} />
-        <TodoList todos={todos} onToggle={toggleTodo} onRemove={removeTodo} />
+        <FilterBar
+          activeFilter={filter}
+          onFilterChange={setFilter}
+          total={todos.length}
+          active={activeCount}
+          completed={completedCount}
+        />
+        <TodoList
+          todos={filteredTodos}
+          onToggle={toggleTodo}
+          onRemove={removeTodo}
+        />
       </div>
     </div>
   );
