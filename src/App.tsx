@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
-import { getTodos } from './services/todoService';
+import { getTodos, createTodo } from './services/todoService';
 import type { Todo } from './models/todo';
 
 function App() {
@@ -24,12 +24,9 @@ function App() {
     document.title = activeCount > 0 ? `(${activeCount}) Todo App` : 'Todo App';
   }, [todos]);
 
-  const addTodo = (text: string) => {
-    const newTodo: Todo = {
-      id: Date.now(),
-      text,
-      completed: false,
-    };
+  const addTodo = async (text: string) => {
+    // The UI calls the service (like with fetch/axios to a real API)
+    const newTodo = await createTodo(text);
     setTodos([...todos, newTodo]);
   };
 
@@ -45,7 +42,7 @@ function App() {
 
   const activeCount = todos.filter((t) => !t.completed).length;
 
-  // Early return: mostra uno stato di caricamento mentre i dati arrivano
+  // Early return: show a loading state while the data is loading
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
