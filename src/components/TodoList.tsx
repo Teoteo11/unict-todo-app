@@ -4,19 +4,26 @@ import EmptyState from './EmptyState';
 
 interface TodoListProps {
   todos: Todo[];
+  onToggle: (id: number) => void;
+  onRemove: (id: number) => void;
 }
 
-function TodoList({ todos }: TodoListProps) {
-  // Early return: early exit to handle the special case
+function TodoList({ todos, onToggle, onRemove }: TodoListProps) {
   if (todos.length === 0) {
     return <EmptyState />;
   }
 
-  // If we get here, the list has at least one element
   return (
     <div className="flex flex-col gap-2">
       {todos.map((todo) => (
-        <TodoItem key={todo.id} todo={todo} />
+        // key  REQUIRED — must be unique and stable
+        // DO NOT use the index as key: causes bugs with reordering and animations
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          onToggle={onToggle}
+          onRemove={onRemove}
+        />
       ))}
     </div>
   );

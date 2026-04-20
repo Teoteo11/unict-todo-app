@@ -16,6 +16,16 @@ function App() {
     setTodos([...todos, newTodo]);
   };
 
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map((t) =>
+      t.id === id ? { ...t, completed: !t.completed } : t
+    ));
+  };
+
+  const removeTodo = (id: number) => {
+    setTodos(todos.filter((t) => t.id !== id));
+  };
+
   const activeCount = todos.filter((t) => !t.completed).length;
 
   return (
@@ -23,7 +33,7 @@ function App() {
       <div className="w-full max-w-lg">
         <Header activeCount={activeCount} />
         <TodoForm onAdd={addTodo} />
-        <TodoList todos={todos} />
+        <TodoList todos={todos} onToggle={toggleTodo} onRemove={removeTodo} />
       </div>
     </div>
   );
