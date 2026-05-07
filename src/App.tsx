@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
-import FilterBar, { type FilterType } from './components/FilterBar';
+import FilterBar, { type FilterType, type PriorityFilter } from './components/FilterBar';
 import { getTodos, createTodo, updateTodo, deleteTodo } from './services/todoService';
-import type { Todo } from './models/todo';
+import type { Todo, Priority } from './models/todo';
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all');
 
   // GET: load todos from the service at mount
   useEffect(() => {
@@ -26,9 +27,8 @@ function App() {
     document.title = activeCount > 0 ? `(${activeCount}) Todo App` : 'Todo App';
   }, [todos]);
 
-  const addTodo = async (text: string) => {
-    // The UI calls the service (like with fetch/axios to a real API)
-    const newTodo = await createTodo(text);
+  const addTodo = async (text: string, priority: Priority, dueDate: string | null) => {
+    const newTodo = await createTodo(text, priority, dueDate);
     setTodos([...todos, newTodo]);
   };
 
@@ -47,13 +47,28 @@ function App() {
     setTodos((prev) => prev.filter((t) => t.id !== id));
   };
 
+  const reorderTodos = (draggedId: number, targetId: number) => {
+    setTodos((prev) => {
+      const result = [...prev];
+      const from = result.findIndex((t) => t.id === draggedId);
+      const to = result.findIndex((t) => t.id === targetId);
+      const [removed] = result.splice(from, 1);
+      result.splice(to, 0, removed);
+      return result;
+    });
+  };
+
   // Derived state: computed from todos, not stored in a separate state variable
   const activeCount = todos.filter((t) => !t.completed).length;
   const completedCount = todos.filter((t) => t.completed).length;
+  const lowCount = todos.filter((t) => t.priority === 'low').length;
+  const mediumCount = todos.filter((t) => t.priority === 'medium').length;
+  const highCount = todos.filter((t) => t.priority === 'high').length;
 
   const filteredTodos = todos.filter((t) => {
-    if (filter === 'active') return !t.completed;
-    if (filter === 'completed') return t.completed;
+    if (filter === 'active' && t.completed) return false;
+    if (filter === 'completed' && !t.completed) return false;
+    if (priorityFilter !== 'all' && t.priority !== priorityFilter) return false;
     return true;
   });
 
@@ -77,11 +92,17 @@ function App() {
           total={todos.length}
           active={activeCount}
           completed={completedCount}
+          activePriorityFilter={priorityFilter}
+          onPriorityFilterChange={setPriorityFilter}
+          low={lowCount}
+          medium={mediumCount}
+          high={highCount}
         />
         <TodoList
           todos={filteredTodos}
           onToggle={toggleTodo}
           onRemove={removeTodo}
+          onReorder={reorderTodos}
         />
       </div>
     </div>

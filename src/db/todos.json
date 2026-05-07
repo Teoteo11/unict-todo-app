@@ -1,4 +1,4 @@
 [
-  { "id": 1, "text": "Study TypeScript", "completed": false },
-  { "id": 2, "text": "Try React", "completed": true }
+  { "id": 1, "text": "Study TypeScript", "completed": false, "priority": "high", "dueDate": "2025-05-10" },
+  { "id": 2, "text": "Try React", "completed": true, "priority": "medium", "dueDate": null }
 ]

@@ -1,10 +1,10 @@
-import type { Todo } from '../models/todo';
+import type { Todo, Priority } from '../models/todo';
 import initialData from '../db/todos.json';
 
 // Note: todos.json is used only as an initial seed.
 // The CRUD operations modify only mockDb in memory and do not write to the file.
 // Simulated in-memory database (reset on page refresh)
-let mockDb: Todo[] = [...initialData];
+let mockDb: Todo[] = [...(initialData as Todo[])];
 
 // Simulate network latency
 const delay = (ms: number): Promise<void> =>
@@ -18,12 +18,18 @@ export async function getTodos(): Promise<Todo[]> {
 }
 
 // POST /todos — creates a new todo and adds it to the db
-export async function createTodo(text: string): Promise<Todo> {
+export async function createTodo(
+  text: string,
+  priority: Priority,
+  dueDate: string | null
+): Promise<Todo> {
   await delay(300);
   const newTodo: Todo = {
     id: Date.now(),
     text,
     completed: false,
+    priority,
+    dueDate,
   };
   mockDb = [...mockDb, newTodo];
   return newTodo;
@@ -32,7 +38,7 @@ export async function createTodo(text: string): Promise<Todo> {
 // PUT /todos/:id — partially updates an existing todo
 export async function updateTodo(
   id: number,
-  patch: Partial<Pick<Todo, 'text' | 'completed'>>
+  patch: Partial<Pick<Todo, 'text' | 'completed' | 'priority' | 'dueDate'>>
 ): Promise<Todo> {
   await delay(300);
   const found = mockDb.find((t) => t.id === id);
